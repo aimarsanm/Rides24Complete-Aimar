@@ -1,0 +1,6 @@
+businessLogic.BLFacadeImplementation#updateAlert(LAlert;)V
+6f6f4555f30dc026ac1a554a8bef3f55
+==
+updateAlert dataAccess.DataAccess#updateAlert(LAlert;)V
+close dataAccess.DataAccess#close()V
+open dataAccess.DataAccess#open()V

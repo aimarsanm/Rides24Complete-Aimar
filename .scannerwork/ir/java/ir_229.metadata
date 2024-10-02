@@ -1,0 +1,6 @@
+businessLogic.BLFacadeImplementation#updateComplaint(LComplaint;)V
+423c481159637a49d18554aac6dd2729
+==
+close dataAccess.DataAccess#close()V
+open dataAccess.DataAccess#open()V
+updateComplaint dataAccess.DataAccess#updateComplaint(LComplaint;)V

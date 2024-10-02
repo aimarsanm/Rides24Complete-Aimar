@@ -1,0 +1,6 @@
+businessLogic.BLFacadeImplementation#addTraveler(Ljava/lang/String;Ljava/lang/String;)Z
+a8a2031f09f0589bf94eedcbad9f9d80
+==
+addTraveler dataAccess.DataAccess#addTraveler(Ljava/lang/String;Ljava/lang/String;)Z
+close dataAccess.DataAccess#close()V
+open dataAccess.DataAccess#open()V

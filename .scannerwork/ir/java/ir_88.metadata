@@ -1,0 +1,5 @@
+domain.Driver#addCar(Ldomain/Car;)V
+bc8e8bc0429b4bb75c09cd28804ddf6c
+==
+add java.util.List#add(Ljava/lang/Object;)Z
+setDriver domain.Car#setDriver(Ldomain/Driver;)V

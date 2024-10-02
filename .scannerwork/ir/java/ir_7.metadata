@@ -1,0 +1,7 @@
+dataAccess.DataAccess#open()V
+e6b049066dca36571eba0b0778e80bec
+java.util.HashMap#<init>()V
+java.util.HashMap#instance-init#
+==
+put java.util.Map#put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+println java.io.PrintStream#println([C)V

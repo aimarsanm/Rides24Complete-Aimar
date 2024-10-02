@@ -1,0 +1,6 @@
+businessLogic.BLFacadeImplementation#getMotaByUsername(Ljava/lang/String;)Ljava/lang/String;
+4e6e087612326308121cf6fd4615c615
+==
+getMotabyUsername dataAccess.DataAccess#getMotabyUsername(Ljava/lang/String;)Ljava/lang/String;
+close dataAccess.DataAccess#close()V
+open dataAccess.DataAccess#open()V

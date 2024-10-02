@@ -1,0 +1,8 @@
+GetActualMoneyMockTest#test1()V
+18eadef495bce286c71eace89e2cb146
+java.util.ArrayList#<init>()V
+java.util.ArrayList#instance-init#
+java.lang.Double#compareTo(Ljava/lang/Double;)I
+==
+getActualMoney dataAccess.DataAccess#getActualMoney(Ljava/lang/String;)D
+add java.util.List#add(Ljava/lang/Object;)Z
