@@ -25,9 +25,15 @@
 </repositories>
 
 <properties>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <maven.compiler.source>1.8</maven.compiler.source>
-</properties>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+
+		<sonar.organization>aimarsanm-1</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+		<sonar.projectKey>aimarsanm-1_ride24complete-aimar</sonar.projectKey>
+		<sonar.login>c325ac999406a2cd61f276ce4f7283ff4edb15ac</sonar.login>
+	</properties>
+
 
 <!-- https://mvnrepository.com/artifact/junit/junit -->
 <dependencies>
