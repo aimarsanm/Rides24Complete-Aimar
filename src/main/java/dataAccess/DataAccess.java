@@ -26,7 +26,9 @@ import exceptions.RideMustBeLaterThanTodayException;
 public class DataAccess {
 	private EntityManager db;
 	private EntityManagerFactory emf;
-	private static final String ACTION_1 = "Donostia"; 
+	
+	private static final String ACTION_1 = "Donostia";
+	
 	ConfigXML c = ConfigXML.getInstance();
 	
 	private String adminPass="admin";
