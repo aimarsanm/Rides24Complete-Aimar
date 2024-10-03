@@ -21,16 +21,17 @@ import domain.Complaint;
 import domain.Movement;
 import exceptions.RideMustBeLaterThanTodayException;
 import exceptions.RideAlreadyExistException;
-
+import java.util.logging.Logger;
 /**
  * It implements the business logic as a web service.
  */
 @WebService(endpointInterface = "businessLogic.BLFacade")
 public class BLFacadeImplementation implements BLFacade {
+	private static final Logger logger = Logger.getLogger(BLFacadeImplementation.class.getName());
 	DataAccess dbManager;
 
 	public BLFacadeImplementation() {
-		System.out.println("Creating BLFacadeImplementation instance");
+		logger.info("Creating BLFacadeImplementation instance");
 
 		dbManager = new DataAccess();
 
