@@ -64,10 +64,10 @@ public class GauzatuEragiketaMockBlackTest {
         boolean deposit = true;
 
         // Mock a user with sufficient balance
-        User User = new User(username, "", "");
+        User user = new User(username, "", "");
         try {
             Mockito.when(db.createQuery(Mockito.anyString(), Mockito.any(Class.class))).thenReturn(typedQuery);
-            Mockito.when(typedQuery.getSingleResult()).thenReturn(User);
+            Mockito.when(typedQuery.getSingleResult()).thenReturn(user);
             
             sut.open();
             boolean result = sut.gauzatuEragiketa(username, amount, deposit);
