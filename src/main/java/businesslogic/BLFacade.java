@@ -1,10 +1,11 @@
 package businesslogic;
 
+
 import java.util.Date;
 
 import java.util.List;
 
-//import domain.Booking;
+
 import domain.Ride;
 import domain.Traveler;
 import domain.User;
@@ -21,11 +22,12 @@ import exceptions.RideAlreadyExistException;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 
+import java.io.Serializable;
 /**
  * Interface that specifies the business logic.
  */
 @WebService
-public interface BLFacade {
+public interface BLFacade extends Serializable{
 
 	/**
 	 * This method returns all the cities where rides depart
