@@ -1,6 +1,7 @@
 package dataAccess;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -19,7 +20,7 @@ import configuration.UtilDate;
 import domain.*;
 import exceptions.RideAlreadyExistException;
 import exceptions.RideMustBeLaterThanTodayException;
-
+import java.nio.file.*;
 /**
  * It implements the data access to the objectDb database
  */
@@ -37,15 +38,25 @@ public class DataAccess {
 		if (c.isDatabaseInitialized()) {
 			String fileName = c.getDbFilename();
 
-			File fileToDelete = new File(fileName);
-			if (fileToDelete.delete()) {
-				File fileToDeleteTemp = new File(fileName + "$");
-				fileToDeleteTemp.delete();
+			Path fileToDelete = Paths.get(fileName);
+		    try {
+		        
+		        Files.delete(fileToDelete);
+		        
+		        
+		        Path fileToDeleteTemp = Paths.get(fileName + "$");
+		        try {
+		            Files.deleteIfExists(fileToDeleteTemp); 
+		        } catch (IOException e) {
+		            System.err.println("operation error" + e.getMessage());
+		            e.printStackTrace();
+		        }
 
-				System.out.println("File deleted");
-			} else {
-				System.out.println("Operation failed");
-			}
+		        System.out.println("File deleted");
+		    } catch (IOException e) {
+		        System.err.println("operation error" + e.getMessage());
+		        e.printStackTrace();
+		    }
 		}
 		open();
 		if (c.isDatabaseInitialized()) {
