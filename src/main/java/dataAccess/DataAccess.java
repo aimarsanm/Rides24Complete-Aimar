@@ -863,44 +863,64 @@ public class DataAccess {
 	}
 
 	public void deleteUser(User us) {
-		try {
-			if (us.getMota().equals("Driver")) {
-				List<Ride> rl = getRidesByDriver(us.getUsername());
-				if (rl != null) {
-					for (Ride ri : rl) {
-						cancelRide(ri);
-					}
-				}
-				Driver d = getDriver(us.getUsername());
-				List<Car> cl = d.getCars();
-				if (cl != null) {
-					for (int i = cl.size() - 1; i >= 0; i--) {
-						Car ci = cl.get(i);
-						deleteCar(ci);
-					}
-				}
-			} else {
-				List<Booking> lb = getBookedRides(us.getUsername());
-				if (lb != null) {
-					for (Booking li : lb) {
-						li.setStatus("Rejected");
-						li.getRide().setnPlaces(li.getRide().getnPlaces() + li.getSeats());
-					}
-				}
-				List<Alert> la = getAlertsByUsername(us.getUsername());
-				if (la != null) {
-					for (Alert lx : la) {
-						deleteAlert(lx.getAlertNumber());
-					}
-				}
-			}
-			db.getTransaction().begin();
-			us = db.merge(us);
-			db.remove(us);
-			db.getTransaction().commit();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	    try {
+	        if (us.getMota().equals("Driver")) {
+	            handleDriverDeletion(us);
+	        } else {
+	            handlePassengerDeletion(us);
+	        }
+	        deleteUserFromDatabase(us);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+
+	private void handleDriverDeletion(User us) {
+	    List<Ride> rides = getRidesByDriver(us.getUsername());
+	    if (rides != null) {
+	        rides.forEach(this::cancelRide);
+	    }
+	    
+	    Driver driver = getDriver(us.getUsername());
+	    deleteCars(driver);
+	}
+
+	private void deleteCars(Driver driver) {
+	    List<Car> cars = driver.getCars();
+	    if (cars != null) {
+	        for (int i = cars.size() - 1; i >= 0; i--) {
+	            deleteCar(cars.get(i));
+	        }
+	    }
+	}
+
+	private void handlePassengerDeletion(User us) {
+	    rejectBookedRides(us);
+	    deleteUserAlerts(us);
+	}
+
+	private void rejectBookedRides(User us) {
+	    List<Booking> bookings = getBookedRides(us.getUsername());
+	    if (bookings != null) {
+	        for (Booking booking : bookings) {
+	            booking.setStatus("Rejected");
+	            booking.getRide().setnPlaces(booking.getRide().getnPlaces() + booking.getSeats());
+	        }
+	    }
+	}
+
+	private void deleteUserAlerts(User us) {
+	    List<Alert> alerts = getAlertsByUsername(us.getUsername());
+	    if (alerts != null) {
+	        alerts.forEach(alert -> deleteAlert(alert.getAlertNumber()));
+	    }
+	}
+
+	private void deleteUserFromDatabase(User us) {
+	    db.getTransaction().begin();
+	    us = db.merge(us);
+	    db.remove(us);
+	    db.getTransaction().commit();
 	}
 
 	public List<Alert> getAlertsByUsername(String username) {
