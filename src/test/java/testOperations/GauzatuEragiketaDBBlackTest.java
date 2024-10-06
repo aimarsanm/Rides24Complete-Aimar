@@ -1,3 +1,4 @@
+package testOperations;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -13,8 +14,6 @@ import org.junit.Test;
 
 import dataAccess.DataAccess;
 import domain.Ride;
-
-import testOperations.TestDataAccess;
 import domain.Driver;
 
 public class GauzatuEragiketaDBBlackTest {

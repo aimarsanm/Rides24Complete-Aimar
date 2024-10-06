@@ -1,3 +1,4 @@
+package testOperations;
 import static org.junit.Assert.*;
 
 import java.text.ParseException;
@@ -10,7 +11,6 @@ import dataAccess.DataAccess;
 import domain.Driver;
 import domain.Ride;
 import domain.Traveler;
-import testOperations.TestDataAccess;
 
 public class BookRideDBBlackTest {
 	

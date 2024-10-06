@@ -1,3 +1,4 @@
+package testOperations;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -16,7 +17,6 @@ import domain.Ride;
 import domain.User;
 import exceptions.RideAlreadyExistException;
 import exceptions.RideMustBeLaterThanTodayException;
-import testOperations.TestDataAccess;
 import domain.Driver;
 
 public class GauzatuEragiketaDBWhiteTest {
