@@ -1,7 +1,6 @@
 package dataAccess;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -20,16 +19,14 @@ import configuration.UtilDate;
 import domain.*;
 import exceptions.RideAlreadyExistException;
 import exceptions.RideMustBeLaterThanTodayException;
-import java.nio.file.*;
+
 /**
  * It implements the data access to the objectDb database
  */
 public class DataAccess {
 	private EntityManager db;
 	private EntityManagerFactory emf;
-	
-	private static final String ACTION_1 = "Donostia";
-	
+
 	ConfigXML c = ConfigXML.getInstance();
 	
 	private String adminPass="admin";
@@ -38,25 +35,15 @@ public class DataAccess {
 		if (c.isDatabaseInitialized()) {
 			String fileName = c.getDbFilename();
 
-			Path fileToDelete = Paths.get(fileName);
-		    try {
-		        
-		        Files.delete(fileToDelete);
-		        
-		        
-		        Path fileToDeleteTemp = Paths.get(fileName + "$");
-		        try {
-		            Files.deleteIfExists(fileToDeleteTemp); 
-		        } catch (IOException e) {
-		            System.err.println("operation error" + e.getMessage());
-		            e.printStackTrace();
-		        }
+			File fileToDelete = new File(fileName);
+			if (fileToDelete.delete()) {
+				File fileToDeleteTemp = new File(fileName + "$");
+				fileToDeleteTemp.delete();
 
-		        System.out.println("File deleted");
-		    } catch (IOException e) {
-		        System.err.println("operation error" + e.getMessage());
-		        e.printStackTrace();
-		    }
+				System.out.println("File deleted");
+			} else {
+				System.out.println("Operation failed");
+			}
 		}
 		open();
 		if (c.isDatabaseInitialized()) {
@@ -117,11 +104,11 @@ public class DataAccess {
 			cal.set(2024, Calendar.APRIL, 20);
 			Date date4 = UtilDate.trim(cal.getTime());
 
-			driver1.addRide(ACTION_1, "Madrid", date2, 5, 20); //ride1
-			driver1.addRide("Irun", ACTION_1, date2, 5, 2); //ride2
-			driver1.addRide("Madrid", ACTION_1, date3, 5, 5); //ride3
+			driver1.addRide("Donostia", "Madrid", date2, 5, 20); //ride1
+			driver1.addRide("Irun", "Donostia", date2, 5, 2); //ride2
+			driver1.addRide("Madrid", "Donostia", date3, 5, 5); //ride3
 			driver1.addRide("Barcelona", "Madrid", date4, 0, 10); //ride4
-			driver2.addRide(ACTION_1, "Hondarribi", date1, 5, 3); //ride5
+			driver2.addRide("Donostia", "Hondarribi", date1, 5, 3); //ride5
 
 			Ride ride1 = driver1.getCreatedRides().get(0);
 			Ride ride2 = driver1.getCreatedRides().get(1);
@@ -202,7 +189,8 @@ public class DataAccess {
 	 */
 	public List<String> getDepartCities() {
 		TypedQuery<String> query = db.createQuery("SELECT DISTINCT r.from FROM Ride r ORDER BY r.from", String.class);
-		return query.getResultList();
+		List<String> cities = query.getResultList();
+		return cities;
 
 	}
 
@@ -366,6 +354,8 @@ public class DataAccess {
 		}
 	}
 
+	
+	//Prueba comentario
 	public boolean isRegistered(String erab, String passwd) {
 		TypedQuery<Long> travelerQuery = db.createQuery(
 				"SELECT COUNT(t) FROM Traveler t WHERE t.username = :username AND t.passwd = :passwd", Long.class);
@@ -489,23 +479,20 @@ public class DataAccess {
 		}
 	}
 
+	
+	
+	//username @Id bezala duen erabiltzaileari dirua gehitu edo kendu egiten zaio. deposit true bada amount gehituko zaio
+	// eta bestela dirua kenduko zaio. Erabiltzailearen diru ezin du inoiz negatiboa izan.
+	
 	public boolean gauzatuEragiketa(String username, double amount, boolean deposit) {
 		try {
 			db.getTransaction().begin();
 			User user = getUser(username);
-			if (user != null) {
-				double currentMoney = user.getMoney();
-				if (deposit) {
-					user.setMoney(currentMoney + amount);
-				} else {
-					if ((currentMoney - amount) < 0)
-						user.setMoney(0);
-					else
-						user.setMoney(currentMoney - amount);
-				}
+			if (user != null) {  // erabiltzailea ez bada aurkitzen ez du ezer egiten eta false bueltatu.
+				diruaAldatu(amount, deposit, user);
 				db.merge(user);
 				db.getTransaction().commit();
-				return true;
+				return true;  // Dena errore gabe gertatu bada true bueltatzen du
 			}
 			db.getTransaction().commit();
 			return false;
@@ -513,6 +500,17 @@ public class DataAccess {
 			e.printStackTrace();
 			db.getTransaction().rollback();
 			return false;
+		}
+	}
+	public void diruaAldatu(double amount, boolean deposit, User user) {
+		double currentMoney = user.getMoney();
+		if (deposit) {
+			user.setMoney(currentMoney + amount);  //deposit true izanda dirua gehitzen zaio
+		} else {
+			if ((currentMoney - amount) < 0)
+				user.setMoney(0); // dirua kentzen zaio, baina ez duenez nahikoa, 0n geratzen da ez geratzeko nagatibon  
+			else
+				user.setMoney(currentMoney - amount);  // dirua kentzen zaio
 		}
 	}
 
@@ -529,26 +527,29 @@ public class DataAccess {
 		}
 	}
 
+	//Metodo honek username erabiltzaileari ride bidaian eskatzen dituen, seats, lekuak erreserbatzen dizkio. Gainera desk-eko deskontuarekin.
+	
 	public boolean bookRide(String username, Ride ride, int seats, double desk) {
+		
 		try {
 			db.getTransaction().begin();
 
 			Traveler traveler = getTraveler(username);
 			if (traveler == null) {
-				return false;
+				return false;  // Ez bada erabiltzailea aurkitu false bueltatzen du.
 			}
 
 			if (ride.getnPlaces() < seats) {
-				return false;
+				return false;  // Ez badaude eskatutako leku nahikoak false bueltatzen du
 			}
 
 			double ridePriceDesk = (ride.getPrice() - desk) * seats;
 			double availableBalance = traveler.getMoney();
 			if (availableBalance < ridePriceDesk) {
-				return false;
+				return false;  // Erabiltzaileak ez badu diru nahikoa false bueltatzen du
 			}
 
-			Booking booking = new Booking(ride, traveler, seats);
+			Booking booking = new Booking(ride, traveler, seats);  // Erreserba berri bat sortu
 			booking.setTraveler(traveler);
 			booking.setDeskontua(desk);
 			db.persist(booking);
@@ -863,64 +864,56 @@ public class DataAccess {
 	}
 
 	public void deleteUser(User us) {
-	    try {
-	        if (us.getMota().equals("Driver")) {
-	            handleDriverDeletion(us);
-	        } else {
-	            handlePassengerDeletion(us);
-	        }
-	        deleteUserFromDatabase(us);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+		try {
+			if (us.getMota().equals("Driver")) {
+				removeDriver(us);
+			} else {
+				removeTraveler(us);
+			}
+			db.getTransaction().begin();
+			us = db.merge(us);
+			db.remove(us);
+			db.getTransaction().commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
-
-	private void handleDriverDeletion(User us) {
-	    List<Ride> rides = getRidesByDriver(us.getUsername());
-	    if (rides != null) {
-	        rides.forEach(this::cancelRide);
-	    }
-	    
-	    Driver driver = getDriver(us.getUsername());
-	    deleteCars(driver);
+	public void removeTraveler(User us) {
+		List<Booking> lb = getBookedRides(us.getUsername());
+		deleteRides(lb);
+		List<Alert> la = getAlertsByUsername(us.getUsername());
+		deleteAlerts(la);
 	}
-
-	private void deleteCars(Driver driver) {
-	    List<Car> cars = driver.getCars();
-	    if (cars != null) {
-	        for (int i = cars.size() - 1; i >= 0; i--) {
-	            deleteCar(cars.get(i));
-	        }
-	    }
+	public void deleteAlerts(List<Alert> la) {
+		if (la != null) {
+			for (Alert lx : la) {
+				deleteAlert(lx.getAlertNumber());
+			}
+		}
 	}
-
-	private void handlePassengerDeletion(User us) {
-	    rejectBookedRides(us);
-	    deleteUserAlerts(us);
+	public void deleteRides(List<Booking> lb) {
+		if (lb != null) {
+			for (Booking li : lb) {
+				li.setStatus("Rejected");
+				li.getRide().setnPlaces(li.getRide().getnPlaces() + li.getSeats());
+			}
+		}
 	}
-
-	private void rejectBookedRides(User us) {
-	    List<Booking> bookings = getBookedRides(us.getUsername());
-	    if (bookings != null) {
-	        for (Booking booking : bookings) {
-	            booking.setStatus("Rejected");
-	            booking.getRide().setnPlaces(booking.getRide().getnPlaces() + booking.getSeats());
-	        }
-	    }
-	}
-
-	private void deleteUserAlerts(User us) {
-	    List<Alert> alerts = getAlertsByUsername(us.getUsername());
-	    if (alerts != null) {
-	        alerts.forEach(alert -> deleteAlert(alert.getAlertNumber()));
-	    }
-	}
-
-	private void deleteUserFromDatabase(User us) {
-	    db.getTransaction().begin();
-	    us = db.merge(us);
-	    db.remove(us);
-	    db.getTransaction().commit();
+	public void removeDriver(User us) {
+		List<Ride> rl = getRidesByDriver(us.getUsername());
+		if (rl != null) {
+			for (Ride ri : rl) {
+				cancelRide(ri);
+			}
+		}
+		Driver d = getDriver(us.getUsername());
+		List<Car> cl = d.getCars();
+		if (cl != null) {
+			for (int i = cl.size() - 1; i >= 0; i--) {
+				Car ci = cl.get(i);
+				deleteCar(ci);
+			}
+		}
 	}
 
 	public List<Alert> getAlertsByUsername(String username) {
@@ -984,24 +977,7 @@ public class DataAccess {
 					.createQuery("SELECT r FROM Ride r WHERE r.date > CURRENT_DATE AND r.active = true", Ride.class);
 			List<Ride> rides = rideQuery.getResultList();
 
-			for (Alert alert : alerts) {
-				boolean found = false;
-				for (Ride ride : rides) {
-					if (UtilDate.datesAreEqualIgnoringTime(ride.getDate(), alert.getDate())
-							&& ride.getFrom().equals(alert.getFrom()) && ride.getTo().equals(alert.getTo())
-							&& ride.getnPlaces() > 0) {
-						alert.setFound(true);
-						found = true;
-						if (alert.isActive())
-							alertFound = true;
-						break;
-					}
-				}
-				if (!found) {
-					alert.setFound(false);
-				}
-				db.merge(alert);
-			}
+			alertFound = alertakAurkitu(alertFound, alerts, rides);
 
 			db.getTransaction().commit();
 			return alertFound;
@@ -1010,6 +986,27 @@ public class DataAccess {
 			db.getTransaction().rollback();
 			return false;
 		}
+	}
+	public boolean alertakAurkitu(boolean alertFound, List<Alert> alerts, List<Ride> rides) {
+		for (Alert alert : alerts) {
+			boolean found = false;
+			for (Ride ride : rides) {
+				if (UtilDate.datesAreEqualIgnoringTime(ride.getDate(), alert.getDate())
+						&& ride.getFrom().equals(alert.getFrom()) && ride.getTo().equals(alert.getTo())
+						&& ride.getnPlaces() > 0) {
+					alert.setFound(true);
+					found = true;
+					if (alert.isActive())
+						alertFound = true;
+					break;
+				}
+			}
+			if (!found) {
+				alert.setFound(false);
+			}
+			db.merge(alert);
+		}
+		return alertFound;
 	}
 
 	public boolean createAlert(Alert alert) {
