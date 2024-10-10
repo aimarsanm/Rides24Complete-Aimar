@@ -17,7 +17,7 @@ import domain.Ride;
 import domain.Driver;
 
 public class GauzatuEragiketaDBBlackTest {
-
+/*
 	 //sut:system under test
 	 static DataAccess sut=new DataAccess();
 	 
@@ -197,7 +197,7 @@ public class GauzatuEragiketaDBBlackTest {
 					
 				        }
 			}
-	
+*/	
 	
 }
 

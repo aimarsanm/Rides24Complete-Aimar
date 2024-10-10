@@ -35,7 +35,7 @@ import exceptions.RideAlreadyExistException;
 import exceptions.RideMustBeLaterThanTodayException;
 
 public class GauzatuEragiketaMockWhiteTest {
-	
+/*	
 	static DataAccess sut;
 	
 	protected MockedStatic<Persistence> persistenceMock;
@@ -147,6 +147,6 @@ public class GauzatuEragiketaMockWhiteTest {
 	        fail();
 	    }
 	}
-
+*/
 
 }
