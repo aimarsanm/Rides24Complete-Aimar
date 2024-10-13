@@ -30,7 +30,9 @@ public class DataAccess {
 	ConfigXML c = ConfigXML.getInstance();
 	
 	private String adminPass="admin";
-
+	
+	private static final String sqlDriver= "SELECT d FROM Driver d WHERE d.username = :username";
+	
 	public DataAccess() {
 		if (c.isDatabaseInitialized()) {
 			String fileName = c.getDbFilename();
@@ -209,53 +211,89 @@ public class DataAccess {
 		return arrivingCities;
 
 	}
+	public class RideData {
+	    private String from;
+	    private String to;
+	    private Date date;
+	    private int nPlaces;
+	    private float price;
+	    private String driverName;
 
+	    public RideData(String from, String to, Date date, int nPlaces, float price, String driverName) {
+	        this.from = from;
+	        this.to = to;
+	        this.date = date;
+	        this.nPlaces = nPlaces;
+	        this.price = price;
+	        this.driverName = driverName;
+	    }
+
+	    
+	    public String getFrom() { return from; }
+	    public String getTo() { return to; }
+	    public Date getDate() { return date; }
+	    public int getNPlaces() { return nPlaces; }
+	    public float getPrice() { return price; }
+	    public String getDriverName() { return driverName; }
+	}
+	public RideData RideData(String from, String to, Date date, int nPlaces, float price, String driverName) {
+		// TODO Auto-generated method stub
+		return new RideData(from, to, date, nPlaces, price, driverName);
+	}
 	/**
 	 * This method creates a ride for a driver
 	 * 
-	 * @param from        the origin location of a ride
-	 * @param to          the destination location of a ride
-	 * @param date        the date of the ride
-	 * @param nPlaces     available seats
-	 * @param driverEmail to which ride is added
+	 * @param rideData 
 	 * 
 	 * @return the created ride, or null, or an exception
 	 * @throws RideMustBeLaterThanTodayException if the ride date is before today
 	 * @throws RideAlreadyExistException         if the same ride already exists for
 	 *                                           the driver
 	 */
-	public Ride createRide(String from, String to, Date date, int nPlaces, float price, String driverName)
-			throws RideAlreadyExistException, RideMustBeLaterThanTodayException {
-		System.out.println(
-				">> DataAccess: createRide=> from= " + from + " to= " + to + " driver=" + driverName + " date " + date);
-		if (driverName==null) return null;
-		try {
-			if (new Date().compareTo(date) > 0) {
-				System.out.println("ppppp");
-				throw new RideMustBeLaterThanTodayException(
-						ResourceBundle.getBundle("Etiquetas").getString("CreateRideGUI.ErrorRideMustBeLaterThanToday"));
-			}
+	public Ride createRide(RideData rideData)throws RideAlreadyExistException, RideMustBeLaterThanTodayException {
+	    
+	    System.out.println(">> DataAccess: createRide => from= " + rideData.getFrom() 
+	        + " to= " + rideData.getTo() 
+	        + " driver= " + rideData.getDriverName() 
+	        + " date= " + rideData.getDate());
 
-			db.getTransaction().begin();
-			Driver driver = db.find(Driver.class, driverName);
-			if (driver.doesRideExists(from, to, date)) {
-				db.getTransaction().commit();
-				throw new RideAlreadyExistException(
-						ResourceBundle.getBundle("Etiquetas").getString("DataAccess.RideAlreadyExist"));
-			}
-			Ride ride = driver.addRide(from, to, date, nPlaces, price);
-			// next instruction can be obviated
-			db.persist(driver);
-			db.getTransaction().commit();
+	    if (rideData.getDriverName() == null) return null;
 
-			return ride;
-		} catch (NullPointerException e) {
-			// TODO Auto-generated catch block
-			return null;
-		}
+	    try {
+	        if (new Date().compareTo(rideData.getDate()) > 0) {
+	            System.out.println("ppppp");
+	            throw new RideMustBeLaterThanTodayException(
+	                ResourceBundle.getBundle("Etiquetas")
+	                .getString("CreateRideGUI.ErrorRideMustBeLaterThanToday"));
+	        }
+
+	        db.getTransaction().begin();
+	        Driver driver = db.find(Driver.class, rideData.getDriverName());
+
+	        if (driver.doesRideExists(rideData.getFrom(), rideData.getTo(), rideData.getDate())) {
+	            db.getTransaction().commit();
+	            throw new RideAlreadyExistException(
+	                ResourceBundle.getBundle("Etiquetas")
+	                .getString("DataAccess.RideAlreadyExist"));
+	        }
+
+	        Ride ride = driver.addRide(
+	            rideData.getFrom(), rideData.getTo(), rideData.getDate(), 
+	            rideData.getNPlaces(), rideData.getPrice());
+
+	        db.persist(driver);
+	        db.getTransaction().commit();
+
+	        return ride;
+
+	    } catch (NullPointerException e) {
+	        return null;
+	    }
+	}
+
 		
 
-	}
+	
 
 	/**
 	 * This method retrieves the rides from two locations on a given date
@@ -380,7 +418,7 @@ public class DataAccess {
 	}
 
 	public Driver getDriver(String erab) {
-		TypedQuery<Driver> query = db.createQuery("SELECT d FROM Driver d WHERE d.username = :username", Driver.class);
+		TypedQuery<Driver> query = db.createQuery(sqlDriver, Driver.class);
 		query.setParameter("username", erab);
 		List<Driver> resultList = query.getResultList();
 		if (resultList.isEmpty()) {
@@ -637,7 +675,7 @@ public class DataAccess {
 	public List<Booking> getBookingFromDriver(String username) {
 		try {
 			db.getTransaction().begin();
-			TypedQuery<Driver> query = db.createQuery("SELECT d FROM Driver d WHERE d.username = :username",
+			TypedQuery<Driver> query = db.createQuery(sqlDriver,
 					Driver.class);
 			query.setParameter("username", username);
 			Driver driver = query.getSingleResult();
@@ -696,7 +734,7 @@ public class DataAccess {
 	public List<Ride> getRidesByDriver(String username) {
 		try {
 			db.getTransaction().begin();
-			TypedQuery<Driver> query = db.createQuery("SELECT d FROM Driver d WHERE d.username = :username",
+			TypedQuery<Driver> query = db.createQuery(sqlDriver,
 					Driver.class);
 			query.setParameter("username", username);
 			Driver driver = query.getSingleResult();
@@ -746,22 +784,61 @@ public class DataAccess {
 		}
 		return era;
 	}
+	
 
-	public boolean erreklamazioaBidali(String nor, String nori, Date gaur, Booking booking, String textua,
-			boolean aurk) {
-		try {
-			db.getTransaction().begin();
+	public class KexaData {
+	    private String nor;
+	    private String nori;
+	    private Date gaur;
+	    private Booking booking;
+	    private String textua;
+	    private boolean aurk;
 
-			Complaint erreklamazioa = new Complaint(nor, nori, gaur, booking, textua, aurk);
-			db.persist(erreklamazioa);
-			db.getTransaction().commit();
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			db.getTransaction().rollback();
-			return false;
-		}
+	    public KexaData(String nor, String nori, Date gaur, Booking booking, String textua, boolean aurk) {
+	        this.nor = nor;
+	        this.nori = nori;
+	        this.gaur = gaur;
+	        this.booking = booking;
+	        this.textua = textua;
+	        this.aurk = aurk;
+	    }
+
+	    
+	    public String getNor() { return nor; }
+	    public String getNori() { return nori; }
+	    public Date getGaur() { return gaur; }
+	    public Booking getBooking() { return booking; }
+	    public String getTextua() { return textua; }
+	    public boolean isAurk() { return aurk; }
 	}
+	public KexaData KexaData(String nor, String nori, Date gaur, Booking book, String textua, boolean aurk) {
+		// TODO Auto-generated method stub
+		return new KexaData(nor, nori, gaur, book, textua, aurk);
+	}
+	public boolean erreklamazioaBidali(KexaData kdata) {
+	    try {
+	        db.getTransaction().begin();
+
+	        Complaint erreklamazioa = new Complaint(
+	        		kdata.getNor(), 
+	        		kdata.getNori(), 
+	        		kdata.getGaur(), 
+	        		kdata.getBooking(), 
+	        		kdata.getTextua(), 
+	        		kdata.isAurk()
+	        );
+
+	        db.persist(erreklamazioa);
+	        db.getTransaction().commit();
+	        return true;
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        db.getTransaction().rollback();
+	        return false;
+	    }
+	}
+
 
 	public void updateComplaint(Complaint erreklamazioa) {
 		try {
@@ -1058,5 +1135,7 @@ public class DataAccess {
 			return null;
 		}
 	}
+	
+	
 
 }

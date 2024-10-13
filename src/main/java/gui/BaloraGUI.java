@@ -19,7 +19,8 @@ import java.util.ResourceBundle;
 import java.awt.event.ActionEvent;
 
 public class BaloraGUI extends JFrame {
-
+	
+	private static final String eti="Etiquetas";
 	private static final long serialVersionUID = 1L;
 	private static BLFacade appFacadeInterface;
 	private JSlider slider;
@@ -39,13 +40,13 @@ public class BaloraGUI extends JFrame {
 
 		setBussinessLogic(LoginGUI.getBusinessLogic());
 		this.setSize(495, 290);
-		this.setTitle(ResourceBundle.getBundle("Etiquetas").getString("BezeroGUI.Baloratu"));
+		this.setTitle(ResourceBundle.getBundle(eti).getString("BezeroGUI.Baloratu"));
 		this.setResizable(false);
 
 		// Bi aukerak aztertu.
 		User us = appFacadeInterface.getUser(username);
 
-		lbltxt = new JLabel(ResourceBundle.getBundle("Etiquetas").getString("BaloraGUI.Izena") + ": " + username);
+		lbltxt = new JLabel(ResourceBundle.getBundle(eti).getString("BaloraGUI.Izena") + ": " + username);
 
 		slider = new JSlider(JSlider.HORIZONTAL, 1, 5, 1);
 		slider.setForeground(new Color(100, 100, 100));
@@ -54,7 +55,7 @@ public class BaloraGUI extends JFrame {
 		slider.setPaintLabels(true);
 		slider.setPaintTicks(true);
 
-		baloratu = new JButton(ResourceBundle.getBundle("Etiquetas").getString("BaloraGUI.Baloratu"));
+		baloratu = new JButton(ResourceBundle.getBundle(eti).getString("BaloraGUI.Baloratu"));
 		baloratu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int kont = slider.getValue();

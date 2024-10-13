@@ -21,7 +21,7 @@ import domain.Driver;
 
 public class GauzatuEragiketaDBWhiteTest {
 
-/*	 
+	 
 	 static DataAccess sut=new DataAccess();
 	 
 	  
@@ -193,6 +193,6 @@ public class GauzatuEragiketaDBWhiteTest {
 	        }
 		   } 
 	
-	*/
+	
 		   
 }
