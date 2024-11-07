@@ -22,6 +22,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import dataAccess.DataAccess;
+import dataAccess.DataAccess.RideData;
 import domain.Driver;
 import domain.Ride;
 import exceptions.RideAlreadyExistException;
@@ -87,8 +88,8 @@ public class CreateRideMockWhiteTest {
 				
 				//invoke System Under Test (sut)  
 				sut.open();
-				Ride ride=sut.createRide(rideFrom, rideTo, rideDate, 0, 0, driverUserName);
-
+				RideData ridedata=sut.RideData(rideFrom, rideTo, rideDate, 0, 0, driverUserName);
+				Ride ride= sut.createRide(ridedata);
 				//verify the results
 				assertNull(ride);
 				
@@ -141,7 +142,8 @@ public class CreateRideMockWhiteTest {
 			
 	      //invoke System Under Test (sut)  
 			sut.open();
-		    Ride r=sut.createRide(rideFrom, rideTo, rideDate, 0, 0, driverUsername);
+			RideData ride= sut.RideData(rideFrom, rideTo, rideDate, 0, 0, driverUsername);
+		    Ride r=sut.createRide(ride);
 			sut.close();
 			
 			assertNull(r);
@@ -185,7 +187,8 @@ public class CreateRideMockWhiteTest {
 				
 				//invoke System Under Test (sut)  
 				sut.open();
-				Ride ride=sut.createRide(rideFrom, rideTo, rideDate, 0, 0, driverUserName);
+				RideData r=sut.RideData(rideFrom, rideTo, rideDate, 0, 0, driverUserName);
+				Ride ride=sut.createRide(r);
 
 				//verify the results
 				assertNull(ride);
@@ -239,7 +242,8 @@ public class CreateRideMockWhiteTest {
 			
 			//invoke System Under Test (sut)  
 			sut.open();
-		    sut.createRide(rideFrom, rideTo, rideDate, 0, 0, driverUsername);
+			
+		    sut.createRide(sut.RideData(rideFrom, rideTo, rideDate, 0, 0, driverPassword));
 			sut.close();
 			
 			fail();
@@ -284,7 +288,7 @@ public class CreateRideMockWhiteTest {
 					
 			//invoke System Under Test (sut)  
 			sut.open();
-			Ride ride=sut.createRide(rideFrom, rideTo, rideDate, 0, 0, driverUsername);
+			Ride ride=sut.createRide(sut.RideData(rideFrom, rideTo, rideDate, 0, 0, driverPassword));
 			sut.close();
 			//verify the results
 			assertNotNull(ride);
