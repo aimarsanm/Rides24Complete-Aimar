@@ -461,4 +461,10 @@ public class BLFacadeImplementation implements BLFacade {
 		return er;
 	}
 
+	public ExtendedIterator<String> getDepartingCitiesIterator() {
+		// TODO Auto-generated method stub
+		List<String> cities = getDepartCities();
+	    return new ExtendedIteratorCities(cities);
+	}
+
 }

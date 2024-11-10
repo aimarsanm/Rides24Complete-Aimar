@@ -182,4 +182,6 @@ public interface BLFacade extends Serializable{
 
 	public Complaint getComplaintsByBook(Booking bo);
 
+	public ExtendedIterator<String> getDepartingCitiesIterator();
+
 }

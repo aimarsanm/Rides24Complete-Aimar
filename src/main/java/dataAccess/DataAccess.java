@@ -55,7 +55,7 @@ public class DataAccess {
 		System.out.println("DataAccess created => isDatabaseLocal: " + c.isDatabaseLocal() + " isDatabaseInitialized: "
 				+ c.isDatabaseInitialized());
 
-		close();
+		//close();
 
 	}
 	//This constructor is used to mock the DB
@@ -79,8 +79,8 @@ public class DataAccess {
 			Driver driver2 = new Driver("Zuri", "456");
 			driver2.setBalorazioa(10);
 			driver2.setBalkop(3);
-			db.persist(driver1);
-			db.persist(driver2);
+			db.merge(driver1);
+			db.merge(driver2);
 
 			Traveler traveler1 = new Traveler("Unax", "789");
 			traveler1.setIzoztatutakoDirua(68);
@@ -90,8 +90,8 @@ public class DataAccess {
 			Traveler traveler2 = new Traveler("Luken", "abc");
 			traveler2.setBalorazioa(4);
 			traveler2.setBalkop(3);
-			db.persist(traveler1);
-			db.persist(traveler2);
+			db.merge(traveler1);
+			db.merge(traveler2);
 
 			Calendar cal = Calendar.getInstance();
 			cal.set(2024, Calendar.MAY, 20);
@@ -117,6 +117,12 @@ public class DataAccess {
 			Ride ride3 = driver1.getCreatedRides().get(2);
 			Ride ride4 = driver1.getCreatedRides().get(3);
 			Ride ride5 = driver2.getCreatedRides().get(0);
+			
+			db.persist(ride1);
+			db.persist(ride2);
+			db.persist(ride3);
+			db.persist(ride4);
+			db.persist(ride5);
 
 			Booking book1 = new Booking(ride4, traveler1, 2);
 			Booking book2 = new Booking(ride1, traveler1, 2);
@@ -165,9 +171,9 @@ public class DataAccess {
 			driver1.addCar(c1);
 			driver1.addCar(c2);
 			driver2.addCar(c3);
-			db.persist(c1);
-			db.persist(c2);
-			db.persist(c3);
+			db.merge(c1);
+			db.merge(c2);
+			db.merge(c3);
 
 			//Admin a1 = new Admin("Jon", "111");
 			//db.persist(a1);
@@ -183,6 +189,8 @@ public class DataAccess {
 			db.getTransaction().rollback();
 		}
 	}
+	
+	
 
 	/**
 	 * This method returns all the cities where rides depart
