@@ -111,7 +111,7 @@ public class DataAccess {
 			driver1.addRide("Madrid", "Donostia", date3, 5, 5); //ride3
 			driver1.addRide("Barcelona", "Madrid", date4, 0, 10); //ride4
 			driver2.addRide("Donostia", "Hondarribi", date1, 5, 3); //ride5
-
+			
 			Ride ride1 = driver1.getCreatedRides().get(0);
 			Ride ride2 = driver1.getCreatedRides().get(1);
 			Ride ride3 = driver1.getCreatedRides().get(2);
@@ -123,7 +123,7 @@ public class DataAccess {
 			db.persist(ride3);
 			db.persist(ride4);
 			db.persist(ride5);
-
+			
 			Booking book1 = new Booking(ride4, traveler1, 2);
 			Booking book2 = new Booking(ride1, traveler1, 2);
 			Booking book4 = new Booking(ride3, traveler1, 1);
@@ -183,7 +183,7 @@ public class DataAccess {
 
 			db.getTransaction().commit();
 			System.out.println("Db initialized");
-
+			System.out.println(driver1.getCreatedRides().size());
 		} catch (Exception e) {
 			e.printStackTrace();
 			db.getTransaction().rollback();
